@@ -142,12 +142,11 @@ def get_user_input(skip_device: bool = False) -> dict:
                 case _:
                     print_warning("No such Desktop environment. Check your spelling and try again")
     else:
-        # TODO: set to gnome when gnome is fixed
-        output_dict["de_name"] = "popos"  # set to gnome
+        # popos is always gnome
+        output_dict["de_name"] = "gnome"
 
     # Gnome has a first time setup -> skip this part for gnome, as there will be a first time setup
-    # TODO: set to gnome when gnome is fixed
-    if not output_dict["de_name"] == "popos":
+    if not output_dict["de_name"] == "gnome":
         print_question("Enter a username for the new user")
         while True:
             output_dict["username"] = input("\033[94m" + "Username(default: 'localuser'): " + "\033[0m")

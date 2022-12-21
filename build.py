@@ -379,8 +379,7 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
     password = build_options["password"]  # quotes interfere with functions below
 
     # Do not pre-setup gnome, as there is a nice gui first time setup on first boot
-    # TODO: Change to gnome
-    if not build_options["de_name"] == "popos":
+    if not build_options["de_name"] == "gnome":
         print_status("Configuring user")
         chroot(f"useradd --create-home --shell /bin/bash {username}")
         # TODO: Fix ) and ( crashing chpasswd
@@ -391,12 +390,18 @@ def post_extract(build_options, kernel_type: str, kernel_version: str, dev_relea
             case "arch" | "fedora":
                 chroot(f"usermod -aG wheel {username}")
 
-        # set timezone build system timezone on device
+        # Copy timezone config from builder system
         host_time_zone = bash("file /etc/localtime")  # read host timezone link
         host_time_zone = host_time_zone[host_time_zone.find("/usr/share/zoneinfo/"):].strip()  # get actual timezone
         chroot(f"ln -sf {host_time_zone} /etc/localtime")
+    else:
+        # Set default locale to en_US.UTF-8, as otherwise the gnome initial setup will fail
+        # Some distros (Fedora) don't have a locale.conf file by default -> Copy our own
+        cpfile("configs/gnome/locale.conf", "/mnt/depthboot/etc/locale.conf")
+        cpfile("configs/gnome/locale.gen", "/mnt/depthboot/etc/locale.gen")
+        chroot("locale-gen")
 
-        print_status("Distro agnostic configuration complete")
+    print_status("Distro agnostic configuration complete")
 
 
 # post extract and distro config
@@ -558,7 +563,7 @@ def start_build(verbose: bool, local_path, kernel_type: str, dev_release: bool, 
     rmdir("/mnt/depthboot/lost+found")
     rmdir("/mnt/depthboot/dev")
 
-    bash("sync")  # write all pending changes to usb
+    bash("sync")  # write all pending changes to image/storage
 
     # /mnt/depthboot doesn't unmount on first try and e2fsck throws an error, therefore its unmounted twice
     try:
