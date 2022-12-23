@@ -157,7 +157,7 @@ def download_rootfs(distro_name: str, distro_version: str) -> None:
                 print_status(f"Downloading pop-os rootfs from github")
                 start_download_progress("/tmp/depthboot-build/popos-rootfs.tar.xz")
                 urlretrieve(
-                    f"https://github.com/eupnea-linux/popos-rootfs/releases/latest/download/popos-rootfs.tar.xz",
+                    f"https://github.com/eupnea-linux/popos-rootfs/releases/download/2022.12.22_02-12/popos-rootfs.tar.xz",
                     filename="/tmp/depthboot-build/popos-rootfs.tar.xz")
                 stop_download_progress()
     except URLError:
